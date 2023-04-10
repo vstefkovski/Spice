@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Spice.Data;
 using Spice.Models;
 using Spice.Models.ViewModels;
+using Spice.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Spice.Areas.Admin.Controllers
 {
+    [Authorize(Roles = SD.ManagerUser)]
     [Area("Admin")]
     public class SubCategoryController : Controller
     {
@@ -28,7 +31,7 @@ namespace Spice.Areas.Admin.Controllers
         //GET INDEX
         public async Task<IActionResult> Index()
         {
-            var subCategories = await _db.SubCategory.Include(s=>s.Category).ToListAsync();
+            var subCategories = await _db.SubCategory.Include(s => s.Category).ToListAsync();
             return View(subCategories);
         }
 
@@ -40,7 +43,7 @@ namespace Spice.Areas.Admin.Controllers
                 CategoryList = await _db.Category.ToListAsync(),
                 SubCategory = new Models.SubCategory(),
                 SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).Select(p => p.Name).Distinct().ToListAsync()
-        };
+            };
             return View(model);
         }
 
@@ -53,7 +56,7 @@ namespace Spice.Areas.Admin.Controllers
             {
                 var doesSubCategoryExists = _db.SubCategory.Include(s => s.Category).Where(s => s.Name == model.SubCategory.Name && s.Category.Id == model.SubCategory.CategoryId);
 
-                if(doesSubCategoryExists.Count() > 0)
+                if (doesSubCategoryExists.Count() > 0)
                 {
                     //Error
                     StatusMessage = "Error : Sub Category exists under " + doesSubCategoryExists.First().Category.Name + " category. Please use another name.";
@@ -89,14 +92,14 @@ namespace Spice.Areas.Admin.Controllers
         //GET - EDIT
         public async Task<IActionResult> Edit(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
             var subCategory = await _db.SubCategory.SingleOrDefaultAsync(m => m.Id == id);
 
-            if(subCategory == null)
+            if (subCategory == null)
             {
                 return NotFound();
             }
@@ -113,7 +116,7 @@ namespace Spice.Areas.Admin.Controllers
         //POST - EDIT
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit( SubCategoryAndCategoryViewModel model)
+        public async Task<IActionResult> Edit(SubCategoryAndCategoryViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -143,6 +146,53 @@ namespace Spice.Areas.Admin.Controllers
                 StatusMessage = StatusMessage
             };
             return View(modelVm);
+        }
+
+        //GET - DETAILS
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var subCategory = await _db.SubCategory.Include(s => s.Category).SingleOrDefaultAsync(m => m.Id == id);
+            if (subCategory == null)
+            {
+                return NotFound();
+
+            }
+            return View(subCategory);
+        }
+
+        //GET - DELETE
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var subCategory = await _db.SubCategory.Include(s => s.Category).SingleOrDefaultAsync(m => m.Id == id);
+            if (subCategory == null)
+            {
+                return NotFound();
+
+            }
+
+            return View(subCategory);
+        }
+
+        //POST - DELETE
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int? id)
+        {
+            var subCategory = await _db.SubCategory.Include(s => s.Category).SingleOrDefaultAsync(m => m.Id == id);
+            _db.SubCategory.Remove(subCategory);
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
