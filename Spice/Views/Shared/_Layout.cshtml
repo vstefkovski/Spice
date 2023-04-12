@@ -9,6 +9,8 @@
     <title>@ViewData["Title"] - Spice</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.10.0/jquery.timepicker.css" integrity="sha512-6Cm0Yxgqgkfc3Xh1TL3OV9K2HXFtWXQ3TmUEtOZJhVC9fcf8+PmdcrgKVtmZ5D+46sGRyOnFCtkc1xREh2lO+g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body class="search-background">
     <header>
@@ -49,7 +51,7 @@
                         @if (HttpContextAccessor.HttpContext.Session.GetInt32(@SD.ssShoppingCartCount) != null)
                         {
                             <li style="color:white">
-                                <a href="#" class="nav-link">
+                                <a asp-area="Customer" asp-controller="Cart" asp-action="Index" class="nav-link">
                                     @{
                                         var count = HttpContextAccessor.HttpContext.Session.GetInt32(@SD.ssShoppingCartCount);
                                     }
@@ -86,6 +88,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://kit.fontawesome.com/b743df8631.js" crossorigin="anonymous"></script>
+    <script src="~/js/jquery-ui.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
