@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Spice.Data;
@@ -200,8 +201,8 @@ namespace Spice.Areas.Customer.Controllers
             }
 
             await _db.SaveChangesAsync();
-            //return RedirectToAction("Confirm", "Order",new { id = detailCart.OrderHeader.Id } );
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Confirm", "Order", new { id = detailCart.OrderHeader.Id });
+            //return RedirectToAction("Index", "Home");
         }
 
         public IActionResult AddCoupon()
@@ -264,5 +265,7 @@ namespace Spice.Areas.Customer.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+       
     }
 }
